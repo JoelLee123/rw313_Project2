@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="431.0" prefWidth="381.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.p2_joel.SenderController">
+   <children>
+      <Button fx:id="sBtnSend" layoutX="137.0" layoutY="349.0" mnemonicParsing="false" onAction="#btnSendFileClicked" prefHeight="25.0" prefWidth="108.0" text="Send File" />
+      <Label layoutX="54.0" layoutY="68.0" text="IP Address" />
+      <TextField fx:id="sFieldIP" alignment="CENTER" layoutX="157.0" layoutY="65.0" promptText="IP" />
+      <ProgressBar fx:id="sProgress" layoutX="24.0" layoutY="383.0" prefHeight="16.0" prefWidth="340.0" progress="0.0" />
+      <RadioButton fx:id="sRadioTCP" layoutX="76.0" layoutY="124.0" mnemonicParsing="false" selected="true" text="TCP">
+         <toggleGroup>
+            <ToggleGroup fx:id="ToggleGroup" />
+         </toggleGroup></RadioButton>
+      <RadioButton fx:id="sRadioRBUDP" layoutX="228.0" layoutY="124.0" mnemonicParsing="false" text="RBUDP" toggleGroup="$ToggleGroup" />
+      <Button fx:id="sBtnDirectory" layoutX="140.0" layoutY="202.0" mnemonicParsing="false" onAction="#btnSelectDirClicked" prefHeight="25.0" prefWidth="108.0" text="Select File" />
+      <Label fx:id="sLabelFile" layoutX="179.0" layoutY="160.0" text="File" />
+      <Label fx:id="sLabelPacket" disable="true" layoutX="52.0" layoutY="250.0" text="Packet size" />
+      <Label fx:id="sLabelBlast" disable="true" layoutX="58.0" layoutY="304.0" text="Blast size" />
+      <TextField fx:id="sFieldBlast" alignment="CENTER" disable="true" layoutX="157.0" layoutY="300.0" promptText="Blast" />
+      <TextField fx:id="sFieldPacket" alignment="CENTER" disable="true" layoutX="157.0" layoutY="247.0" promptText="Packet" />
+   </children>
+</AnchorPane>
