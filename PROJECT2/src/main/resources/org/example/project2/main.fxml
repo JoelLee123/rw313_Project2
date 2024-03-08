@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="1016.0" stylesheets="test-theme.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.project2.Controller">
+   <children>
+      <Rectangle fx:id="fileRectangle" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="97.0" layoutX="2.0" layoutY="164.0" stroke="BLACK" strokeType="INSIDE" width="419.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#4aff2100" height="163.0" layoutX="2.0" layoutY="2.0" stroke="BLACK" strokeType="INSIDE" width="419.0" />
+      <Rectangle fx:id="protocolRectangle" arcHeight="5.0" arcWidth="5.0" fill="#4aff2100" height="169.0" layoutX="2.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="419.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#4aff2100" height="427.0" layoutX="420.0" layoutY="2.0" stroke="BLACK" strokeType="INSIDE" width="595.0" />
+      <Slider fx:id="packetSizeSlider" blockIncrement="200.0" layoutX="7.0" layoutY="384.0" majorTickUnit="1000.0" max="8000.0" minorTickCount="0" prefHeight="38.0" prefWidth="398.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+      <Label fx:id="socketInformationLabel" layoutX="35.0" layoutY="203.0" opacity="0.0" text="Socket Status: " />
+      <Label fx:id="socketStatusLabel" layoutX="138.0" layoutY="203.0" opacity="0.0" text="Waiting for Connection..." />
+      <TextField fx:id="tcpPort" layoutX="192.0" layoutY="8.0" promptText="TCP Port Number" />
+      <Label layoutX="62.0" layoutY="13.0" text="TCP Port Number:" />
+      <Label layoutX="60.0" layoutY="44.0" text="UDP Port Number:" />
+      <TextField fx:id="udpPort" layoutX="192.0" layoutY="40.0" promptText="UDP Port Number" />
+      <TextField fx:id="ipAddress" layoutX="192.0" layoutY="75.0" promptText="IP Address" />
+      <Label layoutX="105.0" layoutY="79.0" text="IP Address:" />
+      <Button fx:id="sendFileButton" layoutX="2.0" layoutY="436.0" mnemonicParsing="false" onAction="#sendFileButtonAction" prefHeight="31.0" prefWidth="127.0" text="Send!" textAlignment="CENTER" underline="true" />
+      <RadioButton fx:id="tcpRadio" layoutX="9.0" layoutY="268.0" mnemonicParsing="false" selected="true" text="TCP" />
+      <RadioButton fx:id="udpRadio" layoutX="86.0" layoutY="268.0" mnemonicParsing="false" text="RBUDP" />
+      <Slider fx:id="blastLengthSlider" blockIncrement="5.0" layoutX="9.0" layoutY="317.0" majorTickUnit="20.0" prefHeight="38.0" prefWidth="398.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+      <Label layoutX="9.0" layoutY="294.0" text="Blast Length" underline="true" />
+      <Label layoutX="9.0" layoutY="358.0" text="Packet Size" underline="true" />
+      <Button fx:id="fileButton" layoutX="150.0" layoutY="230.0" mnemonicParsing="false" onAction="#openFileButtonAction" text="Select File to Send" />
+      <Label layoutX="14.0" layoutY="175.0" text="Selected File:" />
+      <Label layoutX="42.0" layoutY="206.0" text="File Size:" />
+      <Label fx:id="selectedFileLabel" layoutX="112.0" layoutY="164.0" prefHeight="38.0" prefWidth="301.0" text="No File Currently Selected" wrapText="true" />
+      <Label fx:id="fileSizeLabel" layoutX="112.0" layoutY="206.0" prefHeight="16.0" prefWidth="177.0" text="N/A" />
+      <ProgressBar fx:id="udpProgressBar" layoutX="137.0" layoutY="436.0" prefHeight="31.0" prefWidth="872.0" progress="0.0" />
+      <ProgressBar fx:id="fileProgressBar" layoutX="137.0" layoutY="436.0" prefHeight="31.0" prefWidth="872.0" progress="0.0" />
+      <LineChart fx:id="analyticsChart" alternativeRowFillVisible="false" createSymbols="false" layoutX="410.0" layoutY="5.0" legendVisible="false" prefHeight="427.0" prefWidth="605.0">
+        <xAxis>
+          <CategoryAxis animated="false" endMargin="0.0" gapStartAndEnd="false" label="Time (s)" prefHeight="47.0" prefWidth="523.0" startMargin="0.0" tickLabelGap="5.0" tickLength="5.0" fx:id="xAxis" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="yAxis" animated="false" autoRanging="false" label="Speed (MB/s)" minorTickCount="4" minorTickLength="4.0" prefWidth="52.0" side="LEFT" tickLabelGap="4.0" tickLength="6.0" tickUnit="0.2" upperBound="2.0" />
+        </yAxis>
+      </LineChart>
+      <Button fx:id="startReceiverButton" layoutX="8.0" layoutY="135.0" mnemonicParsing="false" onAction="#startReceiverButtonAction" text="Start Receiver" />
+      <Label layoutX="52.0" layoutY="110.0" text="Receiver Directory:" />
+      <Label fx:id="selectedDirLabel" layoutX="192.0" layoutY="99.0" prefHeight="38.0" prefWidth="171.0" text="No Directory Selected" wrapText="true" />
+      <Button fx:id="receiverDirectoryButton" layoutX="287.0" layoutY="135.0" mnemonicParsing="false" onAction="#openDirectoryButtonAction" text="Select Directory" />
+      <Button fx:id="stopReceiverButton" disable="true" layoutX="9.0" layoutY="135.0" mnemonicParsing="false" onAction="#stopReceiverButtonAction" opacity="0.0" text="Stop Receiver" />
+   </children>
+</AnchorPane>
