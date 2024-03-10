@@ -10,13 +10,14 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.*;
+
 /*
     This is the controller class for sender.fxml
     This class therefore handles all attributes and button clicks
     on the UI.
  */
 public class SenderController {
-    //FXML GUI ATTRIBUTES
+    // FXML GUI ATTRIBUTES
     @FXML
     private TextField sFieldIP;
     @FXML
@@ -40,34 +41,36 @@ public class SenderController {
     @FXML
     private ProgressBar sProgress;
 
-    //SOCKET ATTRIBUTES
-    private Sender sender;
+    // SOCKET ATTRIBUTES
+    private TCP_Sender sender;
 
     private long fileSize;
     private double kilobytes;
     private double megabytes;
     private double gigabytes;
 
-    /*public void setSender(Sender sender) {
-        this.sender = sender;
-    }*/
+    /*
+     * public void setSender(Sender sender) {
+     * this.sender = sender;
+     * }
+     */
 
     /**
-     *  The initialize() method is a recognized method in JavaFX.
-     *  JavaFX instantiates the SenderController class which then
-     *  can instantiate the classes we need.
+     * The initialize() method is a recognized method in JavaFX.
+     * JavaFX instantiates the SenderController class which then
+     * can instantiate the classes we need.
      *
-     *  This also handler visibility of RBUDP elements
-     *  when the radio buttons are selected.
+     * This also handler visibility of RBUDP elements
+     * when the radio buttons are selected.
      */
     public void initialize() {
-        sender = new Sender();
+        sender = new TCP_Sender();
 
         ToggleGroup tGroup = new ToggleGroup();
         sRadioTCP.setToggleGroup(tGroup);
         sRadioRBUDP.setToggleGroup(tGroup);
 
-        //When TCP SELECTED
+        // When TCP SELECTED
         sRadioTCP.setOnAction(event -> {
             sLabelPacket.setDisable(true);
             sLabelBlast.setDisable(true);
@@ -82,6 +85,7 @@ public class SenderController {
             sFieldBlast.setDisable(false);
         });
     }
+
     public static void warningSender(String message) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -91,49 +95,47 @@ public class SenderController {
             alert.showAndWait();
         });
     }
+
     @FXML
     public void btnSendFileClicked(ActionEvent event) {
 
-        //VALIDATION BEFORE SENDING
+        // VALIDATION BEFORE SENDING
 
         if (sFieldIP.getText().isEmpty() || sLabelFile.getText().equals("File")) {
-            //IP ADDRESS CANNOT BE EMPTY AND A FILE MUST BE SELECTED
+            // IP ADDRESS CANNOT BE EMPTY AND A FILE MUST BE SELECTED
             warningSender("IP Address cannot be empty and a file must be selected");
             return;
         }
 
         sender.setSenderIP(sFieldIP.getText());
-        //One of the two options must always be selected
+        // One of the two options must always be selected
         if (sRadioRBUDP.isSelected()) {
-            //INITIALIZE RBUDP
-            //USE DATAGRAM METHODS
-            //sender.RBUDP_methods
+            // INITIALIZE RBUDP
+            // USE DATAGRAM METHODS
+            // sender.RBUDP_methods
             System.out.println("RBUDP CASE HANDLED");
 
-            //Make all RBUDP invisible
-
+            // Make all RBUDP invisible
 
         } else {
-            //INITIALIZE TCP
+            // INITIALIZE TCP
             System.out.println("TCP CASE HANDLED");
-            //sender.getData().clear();
-            //Make all RBUDP fields invisible
-
+            // sender.getData().clear();
+            // Make all RBUDP fields invisible
 
             sender.initSocketTCP();
-            sender.initSenderTCP(); //tcpSender.iniSocket
-
+            sender.initSenderTCP(); // tcpSender.iniSocket
             Service<Void> progressBarService = new Service<Void>() {
                 @Override
                 protected Task<Void> createTask() {
-                    //LAMBDA EXPRESSION - Details sometimes hidden under () ->
+                    // LAMBDA EXPRESSION - Details sometimes hidden under () ->
                     return new Task<Void>() {
                         @Override
                         protected Void call() throws Exception {
                             sender.setProgressUpdate(
                                     (workDone, totalWork) -> updateProgress(workDone, totalWork));
                             sender.sendTCP();
-                            //sExecService.shutdownNow();
+                            // sExecService.shutdownNow();
                             return null;
                         }
                     };
@@ -142,16 +144,17 @@ public class SenderController {
             sProgress.progressProperty().bind(progressBarService.progressProperty());
             Platform.runLater(() -> progressBarService.restart());
         }
-        //Setting up progress bar (should be the same for both TCP and RBUDP)
+        // Setting up progress bar (should be the same for both TCP and RBUDP)
     }
+
     @FXML
     public void btnSelectDirClicked(ActionEvent event) {
         System.out.println("SELECT FOLDER TEST");
         String filePath = "";
-        //sender.load_directory_method()
+        // sender.load_directory_method()
 
         Stage stage = (Stage) sBtnDirectory.getScene().getWindow();
-        //JavaFX feature to select a folder
+        // JavaFX feature to select a folder
         FileChooser fChooser = new FileChooser();
 
         File file = fChooser.showOpenDialog(stage);
@@ -160,7 +163,7 @@ public class SenderController {
         } else {
             filePath = getWholePath(file);
             sender.setFile(filePath);
-            //Do the same for UDP?
+            // Do the same for UDP?
         }
     }
 
@@ -192,6 +195,5 @@ public class SenderController {
         }
         return filePath;
     }
-
 
 }

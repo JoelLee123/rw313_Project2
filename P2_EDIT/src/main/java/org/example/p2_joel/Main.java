@@ -14,8 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        //Loading Sender UI
-
+        // Loading Sender UI
         FXMLLoader senderLoader = new FXMLLoader(getClass().getResource("sender.fxml"));
         Parent senderRoot = senderLoader.load();
         Stage senderStage = new Stage();
@@ -23,7 +22,7 @@ public class Main extends Application {
         senderStage.setScene(new Scene(senderRoot));
         senderStage.show();
 
-        //Loading Receiver UI
+        // Loading Receiver UI
         FXMLLoader receiverLoader = new FXMLLoader(getClass().getResource("receiver.fxml"));
         Parent receiverRoot = receiverLoader.load();
         Stage receiverStage = new Stage();
