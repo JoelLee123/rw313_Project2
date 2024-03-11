@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import java.io.*;
 
 /*
-    This is the controller class for sender.fxml
+    This is the controller class for senderTCP.fxml
     This class therefore handles all attributes and button clicks
     on the UI.
  */
@@ -42,18 +42,15 @@ public class SenderController {
     private ProgressBar sProgress;
 
     // SOCKET ATTRIBUTES
-    private TCP_Sender sender;
+    private TCP_Sender senderTCP;
+    private RBUDP_Sender senderRBUDP;
 
     private long fileSize;
     private double kilobytes;
     private double megabytes;
     private double gigabytes;
 
-    /*
-     * public void setSender(Sender sender) {
-     * this.sender = sender;
-     * }
-     */
+
 
     /**
      * The initialize() method is a recognized method in JavaFX.
@@ -64,7 +61,7 @@ public class SenderController {
      * when the radio buttons are selected.
      */
     public void initialize() {
-        sender = new TCP_Sender();
+        senderTCP = new TCP_Sender();
 
         ToggleGroup tGroup = new ToggleGroup();
         sRadioTCP.setToggleGroup(tGroup);
@@ -107,24 +104,57 @@ public class SenderController {
             return;
         }
 
-        sender.setSenderIP(sFieldIP.getText());
         // One of the two options must always be selected
         if (sRadioRBUDP.isSelected()) {
             // INITIALIZE RBUDP
             // USE DATAGRAM METHODS
-            // sender.RBUDP_methods
+            // senderTCP.RBUDP_methods
             System.out.println("RBUDP CASE HANDLED");
 
-            // Make all RBUDP invisible
+            int packetSize = Integer.parseInt(sFieldPacket.getText());
+            int blastLength = Integer.parseInt(sFieldBlast.getText());
+            try {
+                senderRBUDP.setInetAddress(sFieldIP.getText());
+                senderRBUDP.initSocket();
+                senderRBUDP.setPort(1234);
 
+                if (packetSize > 0) {
+                    senderRBUDP.setPacketSize(packetSize);
+                } else {
+                    warningSender("Please select a packet size greater than 0");
+                }
+                if (blastLength > 0) {
+                    senderRBUDP.setBlastLength(blastLength);
+                } else {
+                    warningSender("Please select blast length greater than 0");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Service<Void> progressBarService = new Service<Void>() {
+                @Override
+                protected Task<Void> createTask() {
+                    return new Task<Void>() {
+                        @Override
+                        protected Void call() throws Exception {
+                            senderRBUDP.setProgressUpdate(
+                                    (workDone, totalWork) -> updateProgress(workDone, totalWork));
+                            senderRBUDP.send();
+                            return null;
+                        }
+                    };
+                }
+            };
+            sProgress.progressProperty().bind(progressBarService.progressProperty());
+            Platform.runLater(() -> progressBarService.restart());
         } else {
             // INITIALIZE TCP
             System.out.println("TCP CASE HANDLED");
-            // sender.getData().clear();
+            // senderTCP.getData().clear();
             // Make all RBUDP fields invisible
-
-            sender.initSocketTCP();
-            sender.initSenderTCP(); // tcpSender.iniSocket
+            senderTCP.setSenderIP(sFieldIP.getText());
+            senderTCP.initSocketTCP();
+            senderTCP.initSenderTCP(); // tcpSender.iniSocket
             Service<Void> progressBarService = new Service<Void>() {
                 @Override
                 protected Task<Void> createTask() {
@@ -132,9 +162,9 @@ public class SenderController {
                     return new Task<Void>() {
                         @Override
                         protected Void call() throws Exception {
-                            sender.setProgressUpdate(
+                            senderTCP.setProgressUpdate(
                                     (workDone, totalWork) -> updateProgress(workDone, totalWork));
-                            sender.sendTCP();
+                            senderTCP.sendTCP();
                             // sExecService.shutdownNow();
                             return null;
                         }
@@ -151,7 +181,7 @@ public class SenderController {
     public void btnSelectDirClicked(ActionEvent event) {
         System.out.println("SELECT FOLDER TEST");
         String filePath = "";
-        // sender.load_directory_method()
+        // senderTCP.load_directory_method()
 
         Stage stage = (Stage) sBtnDirectory.getScene().getWindow();
         // JavaFX feature to select a folder
@@ -162,14 +192,14 @@ public class SenderController {
             warningSender("No file selected. Please select a file.");
         } else {
             filePath = getWholePath(file);
-            sender.setFile(filePath);
+            senderTCP.setFile(filePath);
             // Do the same for UDP?
         }
     }
 
     /**
      * SenderController gets a file from a user.
-     * This will be sent over to the receiver when
+     * This will be sent over to the receiverTCP when
      * the send button is clicked.
      *
      * @param file The file to send

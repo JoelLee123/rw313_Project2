@@ -1,6 +1,8 @@
 package org.example.p2_joel;
 
 import java.io.File;
+import java.io.IOException;
+
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import javafx.scene.control.*;
@@ -27,19 +29,21 @@ public class ReceiverController {
     @FXML
     private ProgressBar rProgress;
 
-    private TCP_Receiver receiver; // Instance of Receiver to handle file reception
+    private TCP_Receiver receiverTCP; // Instance of Receiver to handle file reception
+    private RBUDP_Receiver receiverRBUDP;
 
     /* Threads for handling TCP and RBUDP reception */
     public volatile Thread rTCPThread;
     public volatile Thread rRBUDPThread;
 
-    public boolean isRunning = true; // Flag to control the receiver's running state
+    public boolean isRunning = true; // Flag to control the receiverTCP's running state
 
     /**
      * Initializes the ReceiverController and the Receiver instance.
      */
     public void initialize() {
-        receiver = new TCP_Receiver(); // Create a new Receiver instance
+        receiverTCP = new TCP_Receiver(); // Create a new tcp thread
+        receiverRBUDP = new RBUDP_Receiver();   //Create the rbudp thread
     }
 
     /**
@@ -59,7 +63,7 @@ public class ReceiverController {
 
     /**
      * Handles the Start button click event.
-     * Initializes and starts the receiver threads if the IP address and storage
+     * Initializes and starts the receiverTCP threads if the IP address and storage
      * location are set.
      * 
      * @param event The ActionEvent triggered by clicking the Start button.
@@ -78,30 +82,43 @@ public class ReceiverController {
 
             // Start a new thread for TCP reception
             rTCPThread = new Thread(() -> {
-                receiver.initServerSockTCP(); // Initialize server socket for TCP
-                receiver.initReceiverTCP(); // Initialize receiver for TCP
-                while (isRunning) { // Keep receiving files while the receiver is running
-                    receiver.receive();
+                receiverTCP.initServerSockTCP(); // Initialize server socket for TCP
+                receiverTCP.initReceiverTCP(); // Initialize receiverTCP for TCP
+                while (isRunning) { // Keep receiving files while the receiverTCP is running
+                    receiverTCP.receive();
                 }
             });
             rTCPThread.start(); // Start the TCP reception thread
+
+            rRBUDPThread = new Thread(() -> {
+                receiverRBUDP.initSocket();
+                while (isRunning) {
+                    try {
+                        receiverRBUDP.buildMetaData();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                //return null;
+            });
+            rRBUDPThread.start();
         }
     }
 
     /**
      * Handles the Stop button click event.
-     * Stops the receiver threads and closes the TCP connection.
+     * Stops the receiverTCP threads and closes the TCP connection.
      * 
      * @param event The ActionEvent triggered by clicking the Stop button.
      */
     @FXML
     public void btnStopClicked(ActionEvent event) {
-        isRunning = false; // Set running flag to false to stop receiver threads
+        isRunning = false; // Set running flag to false to stop receiverTCP threads
         // Re-enable Start and Storage buttons, disable Stop button
         rBtnStart.setDisable(false);
         rBtnStorage.setDisable(false);
         stopThreads(); // Stop the threads
-        receiver.closeTCP(); // Close the TCP connection
+        receiverTCP.closeTCP(); // Close the TCP connection
         // TODO: Close UDP connection if needed
     }
 
@@ -122,7 +139,7 @@ public class ReceiverController {
             warningReceiver("Please select a directory to store received files.");
         } else {
             directoryPath = getDirectory(file); // Get the directory path
-            receiver.setDirectory(directoryPath); // Set the directory in receiver
+            receiverTCP.setDirectory(directoryPath); // Set the directory in receiverTCP
         }
     }
 
@@ -143,7 +160,7 @@ public class ReceiverController {
     }
 
     /**
-     * Stops the receiver threads by interrupting them.
+     * Stops the receiverTCP threads by interrupting them.
      */
     public void stopThreads() {
         // Interrupt the TCP thread
