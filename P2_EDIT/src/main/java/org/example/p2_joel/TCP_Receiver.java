@@ -19,6 +19,7 @@ public class TCP_Receiver {
     private FileOutputStream fileOut;
     private ObjectOutputStream objOut;
 
+    private volatile boolean isInitialized = false;
     /*
      * Receiver constructor starts by clearing all
      * streams and socket connections
@@ -32,6 +33,10 @@ public class TCP_Receiver {
         objIn = null;
     }
 
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
     public void receive() {
         counter = 0; // Initialize chunk counter
 
@@ -42,7 +47,7 @@ public class TCP_Receiver {
             long totalBytesRead = 0;
             long startTime = System.nanoTime();
 
-            // Read metadata from sender
+            // Read metadata from senderTCP
             data = (Data) objIn.readObject();
             numChunks = data.getNumChunks();
             fileSize = data.getFileSize();
@@ -112,8 +117,9 @@ public class TCP_Receiver {
             socket = sSocket.accept();
             socket.setTcpNoDelay(true);
             System.out.println("[ReceiverTCP.java] Connection established...");
-            objIn = new ObjectInputStream(socket.getInputStream());
             objOut = new ObjectOutputStream(socket.getOutputStream());
+            objIn = new ObjectInputStream(socket.getInputStream());
+            isInitialized = true;
         } catch (IOException e) {
             System.out.println("IOException occured in initReceiverTCP");
         }
@@ -121,8 +127,8 @@ public class TCP_Receiver {
 
     public void initServerSockTCP() {
         try {
-            // Using the same arbitrary port number as sender for TCP
-            sSocket = new ServerSocket(4044);
+            // Using the same arbitrary port number as senderTCP for TCP
+            sSocket = new ServerSocket(1234);
         } catch (IOException e) {
             System.out.println("An IO Exception occurred in initServerSockTCP");
             e.printStackTrace();
@@ -134,25 +140,30 @@ public class TCP_Receiver {
      */
     public void closeTCP() {
         try {
-            if (in != null)
-                in.close();
-            if (fileOut != null)
-                fileOut.close();
-            if (objIn != null)
-                objIn.close();
-            if (objOut != null)
+            if (objOut != null) {
                 objOut.close();
-            if (sSocket != null)
-                sSocket.close();
-            if (socket != null)
+            }
+            if (objIn != null) {
+                objIn.close();
+            }
+            if (fileOut != null) {
+                fileOut.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+            if (socket != null) {
                 socket.close();
-
+            }
+            if (sSocket != null) {
+                sSocket.close();
+            }
         } catch (IOException e) {
             System.out.println("AN IO Exception occurred when closing TCP");
             e.printStackTrace();
         }
-
     }
+    
 
     public String getDirectory() {
         return dir;

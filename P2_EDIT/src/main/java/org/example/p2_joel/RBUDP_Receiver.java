@@ -1,3 +1,4 @@
+
 package org.example.p2_joel;
 
 import java.io.*;
@@ -49,8 +50,14 @@ public class RBUDP_Receiver {
 	private List<Integer> sequenceList = new ArrayList<>();
 	private List<DatagramPacket> receivedPackets = new ArrayList<>();
 
+	private volatile boolean isInitialized = false;
+
 	public RBUDP_Receiver() {
 
+	}
+
+	public boolean isInitialized() {
+		return isInitialized;
 	}
 
 	/**
@@ -83,6 +90,10 @@ public class RBUDP_Receiver {
 			// Set up object input stream to receive objects over the TCP connection
 			this.objectInputStream = new ObjectInputStream(this.socket.getInputStream());
 
+			if (objectInputStream == null|| objectOutStream == null)
+				System.out.println("STILL NULL");
+
+			isInitialized = true;
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -120,8 +131,11 @@ public class RBUDP_Receiver {
 
 	public void buildMetaData() throws ClassNotFoundException {
 		try {
+			System.out.println("Fine");
 
+			if (objectInputStream == null) System.exit(0);
 			this.metaData = (Data) this.objectInputStream.readObject();
+
 			System.out.println("Metadatagram received!");
 
 			fileName = this.metaData.getFileName();
@@ -237,14 +251,14 @@ public class RBUDP_Receiver {
 
 			if (!missingSequenceNumbers.equals("e")) {
 				metaData = new Data();
-				metaData.setState(metaData.State.MISSING_PACKETS);
+				metaData.setState(Data.State.MISSING_PACKETS);
 				metaData.setSequenceList(missingSequenceNumbers);
 				this.objectOutStream.writeObject(metaData);
 				this.objectOutStream.flush();
 				retrieveMissingPackets();
 			} else {
 				metaData = new Data();
-				metaData.setState(metaData.State.NO_MISSING_PACKETS);
+				metaData.setState(Data.State.NO_MISSING_PACKETS);
 				this.objectOutStream.writeObject(metaData);
 				this.objectOutStream.flush();
 				writeToFile();
@@ -348,3 +362,4 @@ public class RBUDP_Receiver {
 		return arrayList;
 	}
 }
+

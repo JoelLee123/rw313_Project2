@@ -34,10 +34,10 @@ public class TCP_Sender {
     }
 
     /**
-     * Sets the IP address of the sender. This IP address is used for both TCP and
+     * Sets the IP address of the senderTCP. This IP address is used for both TCP and
      * RBUDP communication.
      * 
-     * @param IP The sender's IP address, as entered in a textfield in the GUI.
+     * @param IP The senderTCP's IP address, as entered in a textfield in the GUI.
      */
     public void setSenderIP(String IP) {
         sIP = IP;
@@ -79,7 +79,7 @@ public class TCP_Sender {
         try {
             // Initialize the socket if it's null or not connected
             if (socket == null || !socket.isConnected()) {
-                socket = new Socket(sIP, 4044);
+                socket = new Socket(sIP, 1234);
                 socket.setTcpNoDelay(true); // Disables Nagle's algorithm for better performance
             }
         } catch (IOException e) {

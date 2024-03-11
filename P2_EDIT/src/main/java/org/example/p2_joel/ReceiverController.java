@@ -36,7 +36,7 @@ public class ReceiverController {
     public volatile Thread rTCPThread;
     public volatile Thread rRBUDPThread;
 
-    public boolean isRunning = true; // Flag to control the receiverTCP's running state
+    public boolean isRunning = false; // Flag to control the receiverTCP's running state
 
     /**
      * Initializes the ReceiverController and the Receiver instance.
@@ -84,6 +84,15 @@ public class ReceiverController {
             rTCPThread = new Thread(() -> {
                 receiverTCP.initServerSockTCP(); // Initialize server socket for TCP
                 receiverTCP.initReceiverTCP(); // Initialize receiverTCP for TCP
+
+                while (!receiverTCP.isInitialized()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 while (isRunning) { // Keep receiving files while the receiverTCP is running
                     receiverTCP.receive();
                 }
@@ -92,6 +101,15 @@ public class ReceiverController {
 
             rRBUDPThread = new Thread(() -> {
                 receiverRBUDP.initSocket();
+
+                while (!receiverRBUDP.isInitialized()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 while (isRunning) {
                     try {
                         receiverRBUDP.buildMetaData();

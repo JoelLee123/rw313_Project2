@@ -62,6 +62,7 @@ public class SenderController {
      */
     public void initialize() {
         senderTCP = new TCP_Sender();
+        senderRBUDP = new RBUDP_Sender();
 
         ToggleGroup tGroup = new ToggleGroup();
         sRadioTCP.setToggleGroup(tGroup);
@@ -116,7 +117,7 @@ public class SenderController {
             try {
                 senderRBUDP.setInetAddress(sFieldIP.getText());
                 senderRBUDP.initSocket();
-                senderRBUDP.setPort(1234);
+                senderRBUDP.setPort(4044);
 
                 if (packetSize > 0) {
                     senderRBUDP.setPacketSize(packetSize);
@@ -193,6 +194,7 @@ public class SenderController {
         } else {
             filePath = getWholePath(file);
             senderTCP.setFile(filePath);
+            senderRBUDP.setFileDest(filePath);
             // Do the same for UDP?
         }
     }
